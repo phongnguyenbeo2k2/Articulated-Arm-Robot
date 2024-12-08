@@ -10,12 +10,11 @@ function [theta_1, theta_2, theta_3] = new_inverse_kinematic(arm,x, y, z)
     %% calculate theta_3
     c3 = (x^2 + y^2 + z^2 -a2^2 -a3^2) / (2*a2*a3);
     s3 = sqrt(1 - c3^2);
-%     if (x > arm.pos(4,1))        
-%     theta_3 = -atan2(s3,c3) * 180/pi;
-%     else 
-%     theta_3 = +atan2(s3,c3) * 180/pi;
-%     end
+    if (x > arm.pos(4,1))        
+    theta_3 = -atan2(s3,c3) * 180/pi;
+    else 
     theta_3 = +atan2(s3,c3) * 180/pi;
+    end
     %% calculate theta_2
     ts_c2 = (sqrt(x*x + y*y))*(a2 + a3*c3) - z*a3*s3;
     ms_c2 = a2*a2 + a3*a3 + 2*a2*a3*c3;

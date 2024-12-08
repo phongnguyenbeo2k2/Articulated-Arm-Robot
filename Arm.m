@@ -34,14 +34,14 @@ classdef Arm
             obj.joint1_down_limit = -170;
             obj.joint2_up_limit = 155;
             obj.joint2_down_limit = -55;
-            obj.joint3_up_limit = 190;
-            obj.joint3_down_limit = -90;
+            obj.joint3_up_limit = 100;
+            obj.joint3_down_limit = -160;
             obj.is_coordinate = 0;
             obj.T0_0 = [1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1];
             obj.length_link_1 = 3.3;
             obj.length_link_2 = 4.45;
             obj.length_link_3 = 4.4;
-            obj.joint_1_r = 0.75;
+            obj.joint_1_r = 0.5;
             obj.joint_2_r = 0.5;
             obj.joint_3_r = 0.5;
             obj.length_joint_2 = 1.0;
@@ -116,7 +116,7 @@ classdef Arm
             zlabel(handles.robot_plot, 'z');
             xlim(handles.robot_plot, [-10 ,10]); % dat gioi han truc x y z cua axes robot
             ylim(handles.robot_plot, [-10 ,10]);
-            zlim(handles.robot_plot, [0, 15]);
+            zlim(handles.robot_plot, [-5, 15]);
             %% vẽ cột sống của robot
             plot3(handles.robot_plot, self.pos(:,1), self.pos(:,2), self.pos(:,3), '-diamond', 'LineWidth', 7, 'Color', "#4DBEEE");
             %draw link_1

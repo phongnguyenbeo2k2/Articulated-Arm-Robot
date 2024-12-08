@@ -316,7 +316,17 @@ function show_workspace_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of show_workspace
-
+%% begin function
+    global arti_robot
+    axes(handles.robot_plot);
+    if get(hObject, 'Value') == 1
+        Plot_workspace(arti_robot.pos(2,1),arti_robot.pos(2,3));
+    else 
+        arti_robot = Arm(arti_robot.theta(1), arti_robot.theta(2), arti_robot.theta(3));
+        Update_Pose_End_Effector(handles,arti_robot);
+        arti_robot.plot_skeleton(handles);
+    end
+%% end function
 
 % --- Executes on button press in show_coordinate.
 function show_coordinate_Callback(hObject, eventdata, handles)
@@ -597,20 +607,21 @@ denta_theta_3 = new_theta_3 - pre_theta_3;
 temp_arti_robot = arti_robot;
 
 %draw a little each iteration
-for i=1:1:30
-iteration_theta_1 = pre_theta_1 + (denta_theta_1*i/30);
-iteration_theta_2 = pre_theta_2 + (denta_theta_2*i/30);
-iteration_theta_3 = pre_theta_3 + (denta_theta_3*i/30);
-temp_arti_robot = Arm(iteration_theta_1, iteration_theta_2, iteration_theta_3);
-temp_arti_robot.plot_skeleton(handles);
-Update_Pose_End_Effector(handles, temp_arti_robot);
-x = [x, temp_arti_robot.pos(4,1)];
-y = [y, temp_arti_robot.pos(4,2)];
-z = [z, temp_arti_robot.pos(4,3)];
-plot3(handles.robot_plot,x,y,z,'r','LineWidth',1.5);
-hold on;
-pause(0.1);
-end
+    for i=1:1:30
+    iteration_theta_1 = pre_theta_1 + (denta_theta_1*i/30);
+    iteration_theta_2 = pre_theta_2 + (denta_theta_2*i/30);
+    iteration_theta_3 = pre_theta_3 + (denta_theta_3*i/30);
+    temp_arti_robot = Arm(iteration_theta_1, iteration_theta_2, iteration_theta_3);
+    temp_arti_robot.plot_skeleton(handles);
+    Update_Pose_End_Effector(handles, temp_arti_robot);
+    x = [x, temp_arti_robot.pos(4,1)];
+    y = [y, temp_arti_robot.pos(4,2)];
+    z = [z, temp_arti_robot.pos(4,3)];
+    plot3(handles.robot_plot,x,y,z,'r','LineWidth',1.5);
+    hold on;
+    pause(0.1);
+    end
+    warndlg('Done forward movement');
 
 %update previous joint parameter
 handles.pre_theta_1 = new_theta_1;
@@ -641,32 +652,39 @@ function btn_inverse_Callback(hObject, eventdata, handles)
 %     [new_theta_1, new_theta_2, new_theta_3] = arti_robot.InverseKinematic(x_inver,y_inver,z_inver);
      [new_theta_1, new_theta_2, new_theta_3] = new_inverse_kinematic(arti_robot, x_inver,y_inver,z_inver);
     %calulate denta theta
-    denta_theta_1 = new_theta_1 - pre_theta_1;
-    denta_theta_2 = new_theta_2 - pre_theta_2;
-    denta_theta_3 = new_theta_3 - pre_theta_3;
-    temp_arti_robot = arti_robot;
-    %draw a little each iteration
-    for i=1:1:30
-    iteration_theta_1 = pre_theta_1 + (denta_theta_1*i/30);
-    iteration_theta_2 = pre_theta_2 + (denta_theta_2*i/30);
-    iteration_theta_3 = pre_theta_3 + (denta_theta_3*i/30);
-    temp_arti_robot = Arm(iteration_theta_1, iteration_theta_2, iteration_theta_3);
-    temp_arti_robot.plot_skeleton(handles);
-    SetValueTheta(handles,round(iteration_theta_1,4), round(iteration_theta_2,4), round(iteration_theta_3,4));
-    Update_Pose_End_Effector(handles, temp_arti_robot);
-    xx = [xx, temp_arti_robot.pos(4,1)];
-    yy = [yy, temp_arti_robot.pos(4,2)];
-    zz = [zz, temp_arti_robot.pos(4,3)];
-    plot3(handles.robot_plot,xx ,yy ,zz ,'r','LineWidth',1.5);
-    hold on;
-    pause(0.1);
+    check = Check_Limit_Theta(arti_robot, new_theta_1, new_theta_2, new_theta_3);
+    if check == 0
+  
+        denta_theta_1 = new_theta_1 - pre_theta_1;
+        denta_theta_2 = new_theta_2 - pre_theta_2;
+        denta_theta_3 = new_theta_3 - pre_theta_3;
+        temp_arti_robot = arti_robot;
+        %draw a little each iteration
+        for i=1:1:30
+        iteration_theta_1 = pre_theta_1 + (denta_theta_1*i/30);
+        iteration_theta_2 = pre_theta_2 + (denta_theta_2*i/30);
+        iteration_theta_3 = pre_theta_3 + (denta_theta_3*i/30);
+        temp_arti_robot = Arm(iteration_theta_1, iteration_theta_2, iteration_theta_3);
+        temp_arti_robot.plot_skeleton(handles);
+        SetValueTheta(handles,round(iteration_theta_1,4), round(iteration_theta_2,4), round(iteration_theta_3,4));
+        Update_Pose_End_Effector(handles, temp_arti_robot);
+        xx = [xx, temp_arti_robot.pos(4,1)];
+        yy = [yy, temp_arti_robot.pos(4,2)];
+        zz = [zz, temp_arti_robot.pos(4,3)];
+        plot3(handles.robot_plot,xx ,yy ,zz ,'r','LineWidth',1.5);
+        hold on;
+        pause(0.1);
+        end
+        %update previous joint parameter
+        arti_robot = temp_arti_robot;
+        handles.pre_theta_1 = new_theta_1;
+        handles.pre_theta_2 = new_theta_2;
+        handles.pre_theta_3 = new_theta_3;
+        guidata(hObject, handles);
+        warndlg('Done inverse kinematic position');
+    else 
+        warndlg('Out range of worksapce');
     end
-    %update previous joint parameter
-    arti_robot = temp_arti_robot;
-    handles.pre_theta_1 = new_theta_1;
-    handles.pre_theta_2 = new_theta_2;
-    handles.pre_theta_3 = new_theta_3;
-    guidata(hObject, handles);
     %% end fuction
 
 % --- Executes on button press in btn_reset.
@@ -727,68 +745,73 @@ function btn_run_Callback(hObject, eventdata, handles)
     y_inver = str2double(get(handles.text_y_inver,'String'));
     z_inver = str2double(get(handles.text_z_inver,'String'));
     [new_theta_1, new_theta_2, new_theta_3] = arti_robot.InverseKinematic(x_inver,y_inver,z_inver);
-    q1_max = new_theta_1 - pre_theta_1;
-    q2_max = new_theta_2 - pre_theta_2;
-    q3_max = new_theta_3 - pre_theta_3;
-% Step 4: Joint trajectory planning based on LSPB
-    [t1, q1, v1, a1] = LSPB_trajectory(q1_max, v_max, a_max);
-    [t2, q2, v2, a2] = LSPB_trajectory(q2_max, v_max, a_max);
-    [t3, q3, v3, a3] = LSPB_trajectory(q3_max, v_max, a_max);
-
-%Step 5: Do movement and plot graph
-    temp_arti_robot = arti_robot;
-    %plot graph
-    for i=1:length(t3)
-        % joint 1
-        plot(handles.joint1_q, t1(1:i), q1(1:i),'LineWidth',1.5,'Color','m');
-        plot(handles.joint1_v, t1(1:i), v1(1:i),'LineWidth',1.5,'Color','r');
-        plot(handles.joint1_a, t1(1:i), a1(1:i),'LineWidth',1.5,'Color','g');
-        %joint 2
-        plot(handles.joint2_q, t2(1:i), q2(1:i),'LineWidth',1.5,'Color','m');
-        plot(handles.joint2_v, t2(1:i), v2(1:i),'LineWidth',1.5,'Color','r');
-        plot(handles.joint2_a, t2(1:i), a2(1:i),'LineWidth',1.5,'Color','g');
-        %joint 3
-        plot(handles.joint3_q, t3(1:i), q3(1:i),'LineWidth',1.5,'Color','m');
-        plot(handles.joint3_v, t3(1:i), v3(1:i),'LineWidth',1.5,'Color','r');
-        plot(handles.joint3_a, t3(1:i), a3(1:i),'LineWidth',1.5,'Color','g');
-    % do animation movement of robot
-        iteration_theta_1 = pre_theta_1 + q1(i);
-        iteration_theta_2 = pre_theta_2 + q2(i);
-        iteration_theta_3 = pre_theta_3 + q3(i);
-        temp_arti_robot = Arm(iteration_theta_1, iteration_theta_2, iteration_theta_3);
-        temp_arti_robot.plot_skeleton(handles);
-        SetValueTheta(handles,round(iteration_theta_1,4), round(iteration_theta_2,4), round(iteration_theta_3,4));
-        Update_Pose_End_Effector(handles, temp_arti_robot);
-        xx = [xx, temp_arti_robot.pos(4,1)];
-        yy = [yy, temp_arti_robot.pos(4,2)];
-        zz = [zz, temp_arti_robot.pos(4,3)];
-        plot3(handles.robot_plot,xx ,yy ,zz ,'r','LineWidth',1.5);
-        % Calculate velocity of end effector from velocity of each joint by using jacobian
-        J = Cal_jacobian(temp_arti_robot);
-        v_robot = J * ([q1(i) q2(i) q3(i)]');
-        %% plot end-effector space
-        vx = [vx, v_robot(1)];
-        vy = [vy, v_robot(2)];
-        vz = [vz, v_robot(3)];
-        wx = [wx, v_robot(4)];
-        wy = [wy, v_robot(5)];
-        wz = [wz, v_robot(6)];
-        %vx
-        plot(handles.vx_plot, t3(1:i), vx(1: end), 'LineWidth',1.5,'Color','r');
-        %vy
-        plot(handles.vy_plot, t3(1:i), vy(1: end) ,'LineWidth',1.5,'Color','r');
-        %vz 
-        plot(handles.vz_plot, t3(1:i), vz(1: end) ,'LineWidth',1.5,'Color','r');
-        %wx 
-        plot(handles.wx_plot, t3(1:i), wx(1:end) ,'LineWidth',1.5,'Color','r');
-        %wy
-        plot(handles.wy_plot, t3(1:i), wy(1:end) ,'LineWidth',1.5,'Color','r');
-        %wz
-        plot(handles.wz_plot, t3(1:i), wy(1:end) ,'LineWidth',1.5,'Color','r');
-        hold on;  
+    check = Check_Limit_Theta(arti_robot, new_theta_1, new_theta_2, new_theta_3);
+    if check == 0
+        q1_max = new_theta_1 - pre_theta_1;
+        q2_max = new_theta_2 - pre_theta_2;
+        q3_max = new_theta_3 - pre_theta_3;
+    % Step 4: Joint trajectory planning based on LSPB
+        [t1, q1, v1, a1] = LSPB_trajectory(q1_max, v_max, a_max);
+        [t2, q2, v2, a2] = LSPB_trajectory(q2_max, v_max, a_max);
+        [t3, q3, v3, a3] = LSPB_trajectory(q3_max, v_max, a_max);
+    
+    %Step 5: Do movement and plot graph
+        temp_arti_robot = arti_robot;
+        %plot graph
+        for i=1:length(t3)
+            % joint 1
+            plot(handles.joint1_q, t1(1:i), q1(1:i),'LineWidth',1.5,'Color','m');
+            plot(handles.joint1_v, t1(1:i), v1(1:i),'LineWidth',1.5,'Color','r');
+            plot(handles.joint1_a, t1(1:i), a1(1:i),'LineWidth',1.5,'Color','g');
+            %joint 2
+            plot(handles.joint2_q, t2(1:i), q2(1:i),'LineWidth',1.5,'Color','m');
+            plot(handles.joint2_v, t2(1:i), v2(1:i),'LineWidth',1.5,'Color','r');
+            plot(handles.joint2_a, t2(1:i), a2(1:i),'LineWidth',1.5,'Color','g');
+            %joint 3
+            plot(handles.joint3_q, t3(1:i), q3(1:i),'LineWidth',1.5,'Color','m');
+            plot(handles.joint3_v, t3(1:i), v3(1:i),'LineWidth',1.5,'Color','r');
+            plot(handles.joint3_a, t3(1:i), a3(1:i),'LineWidth',1.5,'Color','g');
+        % do animation movement of robot
+            iteration_theta_1 = pre_theta_1 + q1(i);
+            iteration_theta_2 = pre_theta_2 + q2(i);
+            iteration_theta_3 = pre_theta_3 + q3(i);
+            temp_arti_robot = Arm(iteration_theta_1, iteration_theta_2, iteration_theta_3);
+            temp_arti_robot.plot_skeleton(handles);
+            SetValueTheta(handles,round(iteration_theta_1,4), round(iteration_theta_2,4), round(iteration_theta_3,4));
+            Update_Pose_End_Effector(handles, temp_arti_robot);
+            xx = [xx, temp_arti_robot.pos(4,1)];
+            yy = [yy, temp_arti_robot.pos(4,2)];
+            zz = [zz, temp_arti_robot.pos(4,3)];
+            plot3(handles.robot_plot,xx ,yy ,zz ,'r','LineWidth',1.5);
+            % Calculate velocity of end effector from velocity of each joint by using jacobian
+            J = Cal_jacobian(temp_arti_robot);
+            v_robot = J * ([v1(i) v2(i) v3(i)]');
+            %% plot end-effector space
+            vx = [vx, v_robot(1)];
+            vy = [vy, v_robot(2)];
+            vz = [vz, v_robot(3)];
+            wx = [wx, v_robot(4)];
+            wy = [wy, v_robot(5)];
+            wz = [wz, v_robot(6)];
+            %vx
+            plot(handles.vx_plot, t3(1:i), vx(1: end), 'LineWidth',1.5,'Color','r');
+            %vy
+            plot(handles.vy_plot, t3(1:i), vy(1: end) ,'LineWidth',1.5,'Color','r');
+            %vz 
+            plot(handles.vz_plot, t3(1:i), vz(1: end) ,'LineWidth',1.5,'Color','r');
+            %wx 
+            plot(handles.wx_plot, t3(1:i), wx(1:end) ,'LineWidth',1.5,'Color','r');
+            %wy
+            plot(handles.wy_plot, t3(1:i), wy(1:end) ,'LineWidth',1.5,'Color','r');
+            %wz
+            plot(handles.wz_plot, t3(1:i), wy(1:end) ,'LineWidth',1.5,'Color','r');
+            hold on;  
+        end
+        arti_robot = temp_arti_robot;
+        warndlg('Done');
+    else 
+        warndlg('Out range of worksapce');
     end
-    arti_robot = temp_arti_robot;
-    warndlg('Done');
 %% end function
 
 
