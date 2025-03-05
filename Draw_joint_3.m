@@ -2,10 +2,10 @@ function Draw_joint_3(handles, x2, y2, z2, x3, y3, z3, r, h,colr,opa)
 
 theta = atan2(y3 - y2,x3 - x2);
 [Z_1, X_1, Y_1] = cylinder(r, 100);  % Tạo hình trụ với 100 điểm
-% Dịch chuyển tọa độ
-X_1 = X_1 ;  % Đặt chiều dài hình trụ theo trục x
-Y_1 = Y_1*h - h/2;      % Dịch chuyển theo trục y
-Z_1 = Z_1 ;      % Giữ nguyên chiều cao
+
+X_1 = X_1 ;  
+Y_1 = Y_1*h - h/2;      % Đặt chiều dài hình trụ theo trục y
+Z_1 = Z_1 ;   
 
 % Ma trận quay quanh trục z với góc alpha
 R_z = [cos(theta), -sin(theta); 
@@ -18,6 +18,7 @@ R_z = [cos(theta), -sin(theta);
         Y_1(i,j) = xy(2);
         end
     end
+% dịch chuyển tọa độ đến vị trí của joint 3
 X_1 = X_1 + x2;
 Y_1 = Y_1 + y2;
 Z_1 = Z_1 + z2;

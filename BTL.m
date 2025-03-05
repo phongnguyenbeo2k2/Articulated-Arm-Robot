@@ -649,8 +649,8 @@ function btn_inverse_Callback(hObject, eventdata, handles)
     x_inver = str2double(get(handles.text_x_inver,'String'));
     y_inver = str2double(get(handles.text_y_inver,'String'));
     z_inver = str2double(get(handles.text_z_inver,'String'));
-%     [new_theta_1, new_theta_2, new_theta_3] = arti_robot.InverseKinematic(x_inver,y_inver,z_inver);
-     [new_theta_1, new_theta_2, new_theta_3] = new_inverse_kinematic(arti_robot, x_inver,y_inver,z_inver);
+    [new_theta_1, new_theta_2, new_theta_3] = arti_robot.InverseKinematic(x_inver,y_inver,z_inver);
+%      [new_theta_1, new_theta_2, new_theta_3] = new_inverse_kinematic(arti_robot, x_inver,y_inver,z_inver);
     %calulate denta theta
     check = Check_Limit_Theta(arti_robot, new_theta_1, new_theta_2, new_theta_3);
     if check == 0
@@ -783,6 +783,7 @@ function btn_run_Callback(hObject, eventdata, handles)
             yy = [yy, temp_arti_robot.pos(4,2)];
             zz = [zz, temp_arti_robot.pos(4,3)];
             plot3(handles.robot_plot,xx ,yy ,zz ,'r','LineWidth',1.5);
+            hold on;
             % Calculate velocity of end effector from velocity of each joint by using jacobian
             J = Cal_jacobian(temp_arti_robot);
             v_robot = J * ([v1(i) v2(i) v3(i)]');
@@ -804,8 +805,7 @@ function btn_run_Callback(hObject, eventdata, handles)
             %wy
             plot(handles.wy_plot, t3(1:i), wy(1:end) ,'LineWidth',1.5,'Color','r');
             %wz
-            plot(handles.wz_plot, t3(1:i), wy(1:end) ,'LineWidth',1.5,'Color','r');
-            hold on;  
+            plot(handles.wz_plot, t3(1:i), wy(1:end) ,'LineWidth',1.5,'Color','r');  
         end
         arti_robot = temp_arti_robot;
         warndlg('Done');

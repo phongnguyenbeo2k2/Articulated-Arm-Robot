@@ -29,15 +29,19 @@ if all(v == zAxis)
 else
     % Tính trục xoay và góc xoay từ zAxis đến vector v
     axisRotation = vrrotvec(zAxis, v);  % Tính toán trục và góc xoay
-    disp(axisRotation);
-    R = vrrotvec2mat(axisRotation);     % Ma trận xoay tương ứng
+% dòng này dùng để debug    
+%     disp(axisRotation); 
+    % hàm vrrotvec2mat được dùng để
+    % thứ nhất trích xuất thông tin góc xoay trong biến axisRotation
+    % thứ hai là tính ma trận xoay của góc đó
+    R = vrrotvec2mat(axisRotation);     % Ma trận xoay tương ứng vói góc vừa tính được
 end
 
 % Step 4: Mul with Rotation matrix
 for i = 1:2
     for j = 1:length(X)
         point = R * [X(i,j); Y(i,j); Z(i,j) * height];  % Xoay và nhân với chiều cao
-        X(i,j) = point(1) + x0;  % Tịnh tiến đến vị trí đáy 1
+        X(i,j) = point(1) + x0;  % Tịnh tiến đến vị trí đáy 1 cụ thể là joint 2 hoặc joint 3
         Y(i,j) = point(2) + y0;
         Z(i,j) = point(3) + z0;
     end

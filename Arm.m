@@ -119,24 +119,17 @@ classdef Arm
             zlim(handles.robot_plot, [-5, 15]);
             %% vẽ cột sống của robot
             plot3(handles.robot_plot, self.pos(:,1), self.pos(:,2), self.pos(:,3), '-diamond', 'LineWidth', 7, 'Color', "#4DBEEE");
-            %draw link_1
+            %% draw link_1
             Plot_Cylinder(handles,0,0,0,self.joint_1_r, self.length_link_1 - 0.45, [0.4270 0.9290 0.1250], 0.75);
-            %----draw_link_2----
+            %% ----draw_link_2----
             Draw_joint_2(handles,self.pos(2,1),self.pos(2,2) ,self.pos(2,3),self.pos(3,1), self.pos(3,2), self.pos(3,3), self.joint_2_r, self.length_joint_2,'r', 0.75,self.orien(1,3));
             Draw_joint_3(handles, self.pos(3,1), self.pos(3,2), self.pos(3,3), self.pos(4,1),self.pos(4,2), self.pos(4,3),self.joint_3_r, self.length_joint_3, 'r', 0.75);
             %Draw link connect 1 r_link = 8/5 * r_joint
             Draw_link_connect(handles,self.pos(2,:),self.pos(3,:),self.joint_2_r,'b');
             %Draw link connect 2
             Draw_link_connect(handles,self.pos(3,:), self.pos(4,:), self.joint_3_r,'b');
-
-            %% draw coordinate
-            
-            %% ---------------
             view(handles.robot_plot, 25, 40);
             drawnow;
-        end
-        function plot_robot(self, handles)
-
         end
         %Calculate inverse kinematic
         function [theta_1, theta_2, theta_3] = InverseKinematic(self,x, y, z)
@@ -152,21 +145,37 @@ classdef Arm
 %                 return
 %             else
             %calculate base hinh hoc
+            %% elbow down
             %% theta_1
+%             theta_1 = atan2(y,x) * 180 / pi;
+%             %% theta_2
+%             r1 = sqrt(x^2 + y^2);
+%             r2 = z - a1;
+%             phi_2 = atan2(r2,r1);
+%             r3 = sqrt(r1^2 + r2^2);
+%             cos_phi_1 = (a3^2 - a2^2 - r3^2)/(-2*a2*r3);
+%             phi_1 = acos(cos_phi_1);
+%             theta_2 = (phi_2 - phi_1)*180/pi;
+%             %% theta_3
+%             cos_phi_3 = (r3^2 - a2^2 -a3^2)/(-2*a2*a3);
+%             phi_3 = acos(cos_phi_3);
+%             theta_3 = (pi - phi_3) * 180/pi;
+%             end
+            %% elbow up
+            %theta 1
             theta_1 = atan2(y,x) * 180 / pi;
-            %% theta_2
+            % theta_2
             r1 = sqrt(x^2 + y^2);
             r2 = z - a1;
-            phi_2 = atan2(r2,r1);
+            phi_1 = atan2(r2,r1);
             r3 = sqrt(r1^2 + r2^2);
-            cos_phi_1 = (a3^2 - a2^2 - r3^2)/(-2*a2*r3);
-            phi_1 = acos(cos_phi_1);
-            theta_2 = (phi_2 - phi_1)*180/pi;
-            %% theta_3
+            cos_phi_2 = (a3^2 - a2^2 - r3^2)/(-2*a2*r3);
+            phi_2 = acos(cos_phi_2);  
+            theta_2 = (phi_2 + phi_1)*180/pi;
+            %theta 3
             cos_phi_3 = (r3^2 - a2^2 -a3^2)/(-2*a2*a3);
             phi_3 = acos(cos_phi_3);
-            theta_3 = (pi - phi_3) * 180/pi;
-%             end
+            theta_3 = (phi_3 - pi) * 180/pi;
         end
     end
 end
