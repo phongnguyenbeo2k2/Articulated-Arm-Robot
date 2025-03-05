@@ -6,5 +6,6 @@ In this project, robot can:
 - Calculate the velocity of robot in the 3D space from velocity of each joint based on Jacobian matrix.
 - Trapezoidal trajectory planning.
 - Can raw workspace of robot.
+
 My result:
 ![The result](result.PNG)
